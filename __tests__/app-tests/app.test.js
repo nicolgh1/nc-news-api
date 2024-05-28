@@ -7,7 +7,23 @@ const request = require('supertest')
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
-
+describe('GET/api/topics', () => {
+    test('200: returns an array of all topics objects', () => {
+        return request(app)
+        .get('/api/topics')
+        .expect(200)
+        .then(({body}) => {
+            const { topics } = body
+            expect(topics).toHaveLength(3)
+            topics.forEach(topic => {
+                expect(topic).toMatchObject({
+                    slug: expect.any(String),
+                    description: expect.any(String)
+                })
+            });
+        })
+    })
+})
 describe('GET/api', () => {
     test('200: Responds with a nested object. Each object has a key describing a GET, POST, PATCH or POST request to an endpoint starting with "/api"', () => {
         return request(app)
@@ -52,20 +68,39 @@ describe('GET/api', () => {
         })
     })
 })
-describe('GET/api/topics', () => {
-    test('200: returns an array of all topics objects', () => {
+describe('GET /api/articles/:article_id', () => {
+    test('200: Returns an object with one article based on the article_id provided', () => {
         return request(app)
-        .get('/api/topics')
+        .get('/api/articles/1')
         .expect(200)
         .then(({body}) => {
-            const { topics } = body
-            expect(topics).toHaveLength(3)
-            topics.forEach(topic => {
-                expect(topic).toMatchObject({
-                    slug: expect.any(String),
-                    description: expect.any(String)
-                })
-            });
+            const {article} = body
+            expect(article).toMatchObject({
+                article_id: 1,
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                article_img_url: expect.any(String),
+                votes: expect.any(Number)
+            })
+        })
+    })
+    test('400: Returns an error message of "Bad Request" if the article_id is not a number', () => {
+        return request(app)
+        .get('/api/articles/dummy')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+    test('404: Returns an error message of "Not Found" if the article_id number is out of range', () => {
+        return request(app)
+        .get('/api/articles/100')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
         })
     })
 })
