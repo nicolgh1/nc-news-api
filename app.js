@@ -1,7 +1,9 @@
 const express = require("express")
 const app = express()
 app.use(express.json())
-const {getTopics} = require('./controllers/topics.controllers')
+const {getInstructions,getTopics} = require('./controllers/topics.controllers')
+
+app.get('/api',getInstructions)
 
 app.get('/api/topics', getTopics)
 
