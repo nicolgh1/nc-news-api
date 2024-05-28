@@ -1,9 +1,11 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
-
-
-
---- 
-
 This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
+
+# To clone and work on this repo locally:
+The following files are required to be added to create the environment variables:
+    - .env.test
+    - .env.development 
+In each of the files add the databases names as follows (see .env-example).
+    - PGDATABASE = <database-name>
+Make sure to add the files to the .gitignore file before pushing.
