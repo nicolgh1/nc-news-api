@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express()
 const {getInstructions,getTopics} = require('./controllers/topics.controllers')
-const {getArticles,getArticleById,getArticleComments,postComment} = require('./controllers/articles.controllers')
+const {getArticles,getArticleById,getArticleComments,postComment,updateVotes} = require('./controllers/articles.controllers')
 
 app.use(express.json())
 
@@ -14,6 +14,8 @@ app.get('/api/articles/:article_id',getArticleById)
 app.get('/api/articles/:article_id/comments', getArticleComments)
 
 app.post('/api/articles/:article_id/comments',postComment)
+
+app.patch('/api/articles/:article_id',updateVotes)
 
 app.all('*', (req, res) => {
     res.status(404).send({msg: "Route not found"})
