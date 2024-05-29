@@ -4,10 +4,22 @@ const db = require('../../db/connection')
 const testData = require('../../db/data/test-data/index')
 const seed = require('../../db/seeds/seed')
 const request = require('supertest')
+const Test = require('supertest/lib/test')
 require('jest-sorted')
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
+
+describe('GET/api/not-a-path', () => {
+    test('404: returns an error message if the end point is not correctly provided', () => {
+        return request(app)
+        .get('/api/notAPath')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Route not found')
+        })
+    })
+})
 
 describe('GET/api/topics', () => {
     test('200: returns an array of all topics objects', () => {
@@ -136,6 +148,52 @@ describe('GET /api/articles', () => {
         .then(({body}) => {
             expect(body.articles).toBeSortedBy('created_at',{
                 descending: true})
+        })
+    })
+})
+describe('GET /api/articles/:article_id/comments', () => {
+    test('200: Responds with an array of comments for the given article_id of which each comment should have the tested properties', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .then(({body}) => {
+            const {comments} = body
+            comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                    comment_id: expect.any(Number),
+                    votes: expect.any(Number),
+                    created_at: expect.any(String),
+                    author: expect.any(String),
+                    body: expect.any(String),
+                    article_id: expect.any(Number)
+                })
+            })
+        })
+    })
+    test('200: Responds with an array of comments sorted by created_at DESC', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body}) => {
+            const {comments} = body
+            expect(comments).toBeSortedBy('created_at',{
+                descending: true})
+        })
+    })
+    test('200: Returns with an empty array if no comments available', () => {
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({body}) => {
+            const {comments} = body
+            expect(comments).toEqual([])
+        })
+    })
+    test('404: Returns an error message if provided an invalid article_id', () => {
+        return request(app)
+        .get('/api/articles/1000/comments')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
         })
     })
 })
