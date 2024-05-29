@@ -116,7 +116,7 @@ describe('GET /api/articles/:article_id', () => {
         })
     })
 })
-describe('GET /api/articles', () => {
+describe.only('GET /api/articles', () => {
     test('200: returns an array of all articles, all having the required keys', () => {
         return request(app)
         .get('/api/articles')
@@ -147,6 +147,26 @@ describe('GET /api/articles', () => {
             expect(body.articles).toBeSortedBy('created_at',{
                 descending: true})
         })
+    })
+    test('200: Accepts a query of topic which filters the articles by the topic value specified in the query', () => {
+        return request(app)
+        .get('/api/articles?topic=cats')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toHaveLength(1)
+            articles.forEach((article) => {
+                expect(article.topic).toEqual('cats')
+            })
+        })
+    })
+    test('404: Returns an error message if the query topic is not found', () => {
+        return request(app)
+        .get('/api/articles?topic=random')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+            })
     })
 })
 describe('GET /api/articles/:article_id/comments', () => {
@@ -363,7 +383,7 @@ describe('DELETE /api/comments/:comment_id', () => {
     })
 })
 
-describe.only('GET /api/users', () => {
+describe('GET /api/users', () => {
     test('200: Returns an array of user objects each having the tested properties', () => {
         return request(app)
         .get('/api/users')
