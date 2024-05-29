@@ -257,3 +257,86 @@ describe('POST /api/articles/:article_id/comments', () => {
         })
     })
 })
+
+describe.only('PATCH /api/articles/:article_id', () => {
+    test('200: Responds with an object of the updated article id and correct votes number for a positive inc_votes received', () => {
+        const postObj ={
+            inc_votes: 10
+        }
+        return request(app)
+        .patch('/api/articles/1')
+        .send(postObj)
+        .expect(200)
+        .then(({body}) => {
+            const {article} = body
+            expect(article).toMatchObject({
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: expect.any(String),
+                article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                votes: 110
+            })
+        })
+    })
+    test('200: Responds with an object of the updated article id and correct votes number for a negative inc_votes received', () => {
+        const postObj ={
+            inc_votes: -10
+        }
+        return request(app)
+        .patch('/api/articles/1')
+        .send(postObj)
+        .expect(200)
+        .then(({body}) => {
+            const {article} = body
+            expect(article).toMatchObject({
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: expect.any(String),
+                article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                votes: 90
+            })
+        })
+    })
+    test('400: Responds with an error message if the votes provided are not a number', () => {
+        const postObj ={
+            inc_votes: 'test'
+        }
+        return request(app)
+        .patch('/api/articles/1')
+        .send(postObj)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+    test('400: Responds with an error message if the votes key is incorrect', () => {
+        const postObj ={
+            votes: 1
+        }
+        return request(app)
+        .patch('/api/articles/1')
+        .send(postObj)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+    test('404: Responds with an error message if the article_id provided is invalid', () => {
+        const postObj ={
+            inc_votes: 10
+        }
+        return request(app)
+        .patch('/api/articles/1000')
+        .send(postObj)
+        .expect(404)
+        .then(({body}) => {
+            console.log(body)
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+})
+
