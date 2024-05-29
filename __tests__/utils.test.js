@@ -2,6 +2,7 @@ const {
   convertTimestampToDate,
   createRef,
   formatComments,
+  matchArraysOnKey
 } = require("../db/seeds/utils");
 
 describe("convertTimestampToDate", () => {
