@@ -4,7 +4,6 @@ const db = require('../../db/connection')
 const testData = require('../../db/data/test-data/index')
 const seed = require('../../db/seeds/seed')
 const request = require('supertest')
-const Test = require('supertest/lib/test')
 require('jest-sorted')
 
 beforeEach(() => seed(testData));
@@ -360,6 +359,25 @@ describe('DELETE /api/comments/:comment_id', () => {
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toEqual('Bad Request')
+        })
+    })
+})
+
+describe.only('GET /api/users', () => {
+    test('200: Returns an array of user objects each having the tested properties', () => {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then(({body}) => {
+            const {users} = body
+            expect(users).toHaveLength(4)
+            users.forEach((user) => {
+                expect(user).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String)
+                })
+            })
         })
     })
 })
