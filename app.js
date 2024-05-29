@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express()
 const {getInstructions,getTopics} = require('./controllers/topics.controllers')
-const {getArticles,getArticleById,getArticleComments,postComment,updateVotes} = require('./controllers/articles.controllers')
+const {getArticles,getArticleById,getArticleComments,postComment,updateVotes,deleteComment} = require('./controllers/articles.controllers')
 
 app.use(express.json())
 
@@ -16,6 +16,8 @@ app.get('/api/articles/:article_id/comments', getArticleComments)
 app.post('/api/articles/:article_id/comments',postComment)
 
 app.patch('/api/articles/:article_id',updateVotes)
+
+app.delete('/api/comments/:comment_id',deleteComment)
 
 app.all('*', (req, res) => {
     res.status(404).send({msg: "Route not found"})
@@ -32,7 +34,6 @@ app.use((err,req,res,next) => {
         res.status(400).send({msg: 'Bad Request'})
     }
     if(err.code === '23503'){
-        // console.log(err.detail)
         res.status(404).send({msg: 'Not Found'})
     }
     else next(err)

@@ -258,7 +258,7 @@ describe('POST /api/articles/:article_id/comments', () => {
     })
 })
 
-describe.only('PATCH /api/articles/:article_id', () => {
+describe('PATCH /api/articles/:article_id', () => {
     test('200: Responds with an object of the updated article id and correct votes number for a positive inc_votes received', () => {
         const postObj ={
             inc_votes: 10
@@ -340,3 +340,26 @@ describe.only('PATCH /api/articles/:article_id', () => {
     })
 })
 
+describe('DELETE /api/comments/:comment_id', () => {
+    test('204: succesfully deletes the comment by the comment_id returns no content', () => {
+        return request(app)
+        .delete('/api/comments/1')
+        .expect(204)
+    })
+    test('404: returns an error message if the comment_id is not found', () => {
+        return request(app)
+        .delete('/api/comments/1000')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('400: returns an error message if the comment_id is an invalid value', () => {
+        return request(app)
+        .delete('/api/comments/test')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+})
