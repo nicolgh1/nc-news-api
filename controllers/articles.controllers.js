@@ -1,8 +1,7 @@
 const app = require('../app')
 const db = require('../db/connection')
-const articles = require('../db/data/test-data/articles')
-const comments = require('../db/data/test-data/comments')
-const articleData = require('../db/data/test-data/index')
+const {articleData, commentData, topicData, userData} = require('../db/data/test-data/index')
+
 const {selectsArticles,selectArticleById,selectArticleComments,checkItemExistsInTable,createComment,calculateVotes, removeComment} = require('../modules/articles.models')
 
 exports.getArticleById = (req,res,next) => {
