@@ -15,9 +15,8 @@ exports.selectArticleById = (article_id) => {
     })
 }
 
-exports.selectsArticles = () => {
-    return db.query(`
-    SELECT articles.article_id, articles.title, articles.topic, articles.author,articles.created_at, articles.votes, articles.article_img_url,
+exports.selectsArticles = (topic = 'none') => {
+    let sqlQuery = `SELECT articles.article_id, articles.title, articles.topic, articles.author,articles.created_at, articles.votes, articles.article_img_url,
     COALESCE(CAST(countTable.comment_count AS INTEGER),0) AS comment_count
     FROM articles
     LEFT JOIN (
@@ -25,9 +24,15 @@ exports.selectsArticles = () => {
         FROM comments
         GROUP BY article_id
     ) countTable
-    ON articles.article_id = countTable.article_id
-    ORDER BY articles.created_at DESC;
-    `).then((response) => {
+    ON articles.article_id = countTable.article_id`
+    if(topic!=='none'){
+        sqlQuery += ` WHERE articles.topic = '${topic}'`
+    }
+    sqlQuery += ` ORDER BY articles.created_at DESC;`
+    return db.query(sqlQuery).then((response) => {
+        if(topic!=='none' && response.rows.length === 0){
+            return Promise.reject({status:404, msg: 'Not Found'})
+        }
         return response.rows
     })
 }
