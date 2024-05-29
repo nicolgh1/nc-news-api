@@ -50,3 +50,12 @@ exports.checkItemExistsInTable = (column_name,item_id,table_name) => {
         }
     })
 }
+
+exports.createComment = (article_id,insertObj) => {
+    const {author, body} = insertObj
+    return db.query(`
+    INSERT INTO comments (article_id,author, body)
+    VALUES ($1,$2,$3) RETURNING *;`,[article_id,author,body]).then((response) => {
+        return response.rows[0]
+    })
+}
