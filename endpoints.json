@@ -95,5 +95,10 @@
         }
       ] 
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the comment based on the comment_id provided. Returns no content",
+    "queries": [],
+    "exampleResponse":{}
   }
 }
