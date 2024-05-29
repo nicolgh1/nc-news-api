@@ -20,7 +20,6 @@ describe('GET/api/not-a-path', () => {
         })
     })
 })
-
 describe('GET/api/topics', () => {
     test('200: returns an array of all topics objects', () => {
         return request(app)
@@ -46,7 +45,7 @@ describe('GET/api', () => {
         .then(({body}) => {
             const instructionsKeys = Object.keys(body.instructions)
             instructionsKeys.forEach((key) => {
-                expect(key).toMatch(/^(get|push|patch|delete) \/api/i)
+                expect(key).toMatch(/^(get|post|patch|delete) \/api/i)
             })
 
         })
@@ -194,6 +193,67 @@ describe('GET /api/articles/:article_id/comments', () => {
         .expect(404)
         .then(({body}) => {
             expect(body.msg).toEqual('Not Found')
+        })
+    })
+})
+
+describe('POST /api/articles/:article_id/comments', () => {
+    test('201: Updates te comments table and responds with the updated comment', () => {
+        const postObj = {
+            author: 'butter_bridge',
+            body: 'test body'
+        }
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send(postObj)
+        .expect(201)
+        .then(({body}) => {
+            const {comment} = body
+            expect(comment).toMatchObject({
+                    body: 'test body',
+                    votes: 0,
+                    author: "butter_bridge",
+                    article_id: 2,
+                    created_at: expect.any(String)
+            })
+        })
+    })
+    test(`404: Returns an error if given an invalid author_id`, () => {
+        const postObj = {
+            author: 'butter_bridge',
+            body: 'test body'
+        }
+        return request(app)
+        .post('/api/articles/1000/comments')
+        .send(postObj)
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test(`404: Returns an error if given an invalid username`, () => {
+        const postObj = {
+            author: 'test-username',
+            body: 'test body'
+        }
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(postObj)
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('400 Returns an error if body is incorrect', () => {
+        const postObj = {
+            body: 'test body'
+        }
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(postObj)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
         })
     })
 })
