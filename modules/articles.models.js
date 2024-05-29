@@ -1,5 +1,6 @@
 const { response } = require('../app')
 const db = require('../db/connection')
+const format = require('pg-format')
 const { matchArraysOnKey } = require('../db/seeds/utils')
 
 exports.selectArticleById = (article_id) => {
@@ -28,5 +29,24 @@ exports.selectsArticles = () => {
     ORDER BY articles.created_at DESC;
     `).then((response) => {
         return response.rows
+    })
+}
+
+exports.selectArticleComments = (article_id) => {
+    return db.query(`
+    SELECT * FROM comments
+    WHERE article_id = $1
+    ORDER BY created_at DESC;`,[article_id])
+    .then((response) => {
+        return response.rows
+    })
+}
+
+exports.checkItemExistsInTable = (column_name,item_id,table_name) => {
+    const queryText = `SELECT * FROM ${table_name} WHERE ${column_name} = $1`
+    return db.query(queryText, [item_id]).then((response) => {
+        if(response.rows.length===0){
+            return Promise.reject({status: 404, msg:'Not Found'})
+        }
     })
 }

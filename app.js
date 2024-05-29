@@ -1,8 +1,7 @@
 const express = require("express")
 const app = express()
-app.use(express.json())
 const {getInstructions,getTopics} = require('./controllers/topics.controllers')
-const {getArticles,getArticleById} = require('./controllers/articles.controllers')
+const {getArticles,getArticleById,getArticleComments} = require('./controllers/articles.controllers')
 
 app.get('/api',getInstructions)
 
@@ -10,7 +9,11 @@ app.get('/api/topics', getTopics)
 
 app.get('/api/articles',getArticles)
 app.get('/api/articles/:article_id',getArticleById)
+app.get('/api/articles/:article_id/comments', getArticleComments)
 
+app.all('*', (req, res) => {
+    res.status(404).send({msg: "Route not found"})
+})
 app.use((err, req, res, next)=>{
     if (err.status) {
         res.status(err.status).send({ msg: err.msg })
