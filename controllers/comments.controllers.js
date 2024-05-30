@@ -10,7 +10,6 @@ const {removeComment,calculateCommentVotes} = require('../modules/comments.model
 exports.deleteComment = (req,res,next) => {
     const {comment_id} = req.params
     removeComment(comment_id).then((msg)=> {
-        console.log(msg,'msg')
         res.status(204).send({msg})
     }).catch(next)
 }

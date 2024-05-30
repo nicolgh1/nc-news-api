@@ -186,5 +186,10 @@
         }
       ] 
     }
+  },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes the article based on the article_id provided. Returns no content. If the article has comments connected then it will throw an error. Delete comments before deleting the article",
+    "queries": [],
+    "exampleResponse":{}
   }
 }

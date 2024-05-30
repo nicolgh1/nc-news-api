@@ -1,3 +1,4 @@
+const { response } = require('../app')
 const db = require('../db/connection')
 const format = require('pg-format')
 
@@ -101,7 +102,6 @@ exports.calculateVotes = (article_id,inc_votes) => {
     SET votes = votes + $1 
     WHERE article_id = $2 RETURNING *`
     return db.query(sqlQuery,[inc_votes,article_id]).then((response) => {
-        console.log(response.rows, 'in model')
         return response.rows[0]
     })
 }
@@ -113,8 +113,21 @@ exports.createArticle = (postObj) => {
     (title,topic,author,body,article_img_url) 
     VALUES ($1,$2,$3,$4,$5) 
     RETURNING *;`,[title,topic,author,body,article_img_url]).then((response) => {
-        console.log(response.rows)
         return response.rows[0]
+    })
+}
+exports.removeArticle = (article_id) => {
+    return db.query(`
+    DELETE FROM articles
+    WHERE article_id = $1
+    RETURNING *;`, [article_id]).then((response) => {
+        if(response.rows.length === 1){
+            return 'Article Deleted'
+        }
+        else return Promise.reject({
+            status:400,
+            msg: 'Bad Request'
+        })
     })
 }
 

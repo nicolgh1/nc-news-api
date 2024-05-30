@@ -398,7 +398,6 @@ describe('PATCH /api/articles/:article_id', () => {
         .send(postObj)
         .expect(404)
         .then(({body}) => {
-            console.log(body)
             expect(body.msg).toEqual('Not Found')
         })
     })
@@ -641,6 +640,29 @@ describe('POST /api/topi', () => {
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toEqual('Bad Request')
+        })
+    })
+})
+describe('DELETE /api/articles/:article_id', () => {
+    test('204: Succesfully deletes the article, responds with no content', () => {
+        return request(app)
+        .delete('/api/articles/2')
+        .expect(204)
+    })
+    test('400: Response with an error message if the article_id is invalid', () => {
+        return request(app)
+        .delete('/api/articles/200')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+    test('400: Response with an error message if the article is still connected to other tables', () => {
+        return request(app)
+        .delete('/api/articles/1')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Article Referenced in other tables')
         })
     })
 })
