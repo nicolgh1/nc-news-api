@@ -446,3 +446,26 @@ describe('GET /api/users', () => {
         })
     })
 })
+describe('GET /api/users/:username', () => {
+    test('200: return a user by username', () => {
+        return request(app)
+        .get('/api/users/butter_bridge')
+        .expect(200)
+        .then(({body}) => {
+            const {user} = body
+            expect(user).toEqual({
+                username: 'butter_bridge',
+                name: 'jonny',
+                avatar_url:'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+            })
+        })
+    })
+    test('404: Returns an error message if the username is incorrect', () => {
+        return request(app)
+        .get('/api/users/test-user')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+})
