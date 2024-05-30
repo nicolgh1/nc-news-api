@@ -613,3 +613,34 @@ describe('POST /api/articles', () => {
         })
     })
 })
+describe('POST /api/topi', () => {
+    test('201: Updates the topics table and responds with an object of of the updated topic', () => {
+        const postObj = {
+            description: 'test-description',
+            slug: 'test-name'
+        }
+        return request(app)
+        .post('/api/topics')
+        .send(postObj)
+        .expect(201)
+        .then(({body}) => {
+            const {topic} = body
+            expect(topic).toEqual({
+                description: 'test-description',
+                slug: 'test-name'
+            })
+        })
+    })
+    test('400: Responds with an error message if the post object doesn\'t have all parameters', () => {
+        const postObj = {
+            slug: 'test-name'
+        }
+        return request(app)
+        .post('/api/topics')
+        .send(postObj)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+})
