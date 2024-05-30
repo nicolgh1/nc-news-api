@@ -2,7 +2,7 @@ const app = require('../app')
 const db = require('../db/connection')
 const {articleData, commentData, topicData, userData} = require('../db/data/test-data/index')
 
-const {selectsArticles,selectArticleById,selectArticleComments,checkItemExistsInTable,createComment,calculateVotes, removeComment} = require('../modules/articles.models')
+const {selectsArticles,selectArticleById,selectArticleComments,checkItemExistsInTable,createComment,calculateVotes,createArticle} = require('../modules/articles.models')
 
 exports.getArticleById = (req,res,next) => {
     const article_id = req.params.article_id
@@ -50,11 +50,9 @@ exports.updateVotes = (req,res,next) => {
         res.status(200).send({article})
     }).catch(next)
 }
-
-exports.deleteComment = (req,res,next) => {
-    const {comment_id} = req.params
-    removeComment(comment_id).then((msg)=> {
-        console.log(msg,'msg')
-        res.status(204).send({msg})
+exports.postArticle = (req,res,next) => {
+    const postObj = req.body
+    createArticle(postObj).then((article) => {
+        res.status(201).send({article})
     }).catch(next)
 }

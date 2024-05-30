@@ -1,7 +1,5 @@
-const { response } = require('../app')
 const db = require('../db/connection')
 const format = require('pg-format')
-const { matchArraysOnKey } = require('../db/seeds/utils')
 
 exports.selectArticleById = (article_id) => {
     const sqlQuery = `
@@ -103,17 +101,20 @@ exports.calculateVotes = (article_id,inc_votes) => {
     SET votes = votes + $1 
     WHERE article_id = $2 RETURNING *`
     return db.query(sqlQuery,[inc_votes,article_id]).then((response) => {
+        console.log(response.rows, 'in model')
         return response.rows[0]
     })
 }
 
-exports.removeComment = (comment_id) => {
+exports.createArticle = (postObj) => {
+    const {title,topic,author,body,article_img_url} = postObj
     return db.query(`
-    DELETE FROM comments
-    WHERE comment_id = $1 RETURNING *`,[comment_id]).then((response) => {
-        if(response.rows.length === 1){
-            return 'Comment deleted'
-        }
-        else return Promise.reject({status: 404, msg: 'Not Found'})
+    INSERT INTO articles 
+    (title,topic,author,body,article_img_url) 
+    VALUES ($1,$2,$3,$4,$5) 
+    RETURNING *;`,[title,topic,author,body,article_img_url]).then((response) => {
+        console.log(response.rows)
+        return response.rows[0]
     })
 }
+

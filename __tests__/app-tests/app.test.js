@@ -469,3 +469,147 @@ describe('GET /api/users/:username', () => {
         })
     })
 })
+
+describe('PATCH /api/comments/:comment_id', () => {
+    test('200: Updates the number of votes a comment has and returns the updated comment', () => {
+        const postObj = {
+            inc_votes: 10
+        }
+        return request(app)
+        .patch('/api/comments/1')
+        .send (postObj)
+        .expect(200)
+        .then(({body}) => {
+            const {comment} = body
+            expect(comment).toMatchObject({
+                    body: expect.any(String),
+                    votes: 26,
+                    author: "butter_bridge",
+                    article_id: 9,
+                    comment_id: 1,
+            })
+        })
+    })
+    test('200: Updates the number of votes a comment has when given a negative number and returns the updated comment', () => {
+        const postObj = {
+            inc_votes: -10
+        }
+        return request(app)
+        .patch('/api/comments/1')
+        .send (postObj)
+        .expect(200)
+        .then(({body}) => {
+            const {comment} = body
+            expect(comment).toMatchObject({
+                    body: expect.any(String),
+                    votes: 6,
+                    author: "butter_bridge",
+                    article_id: 9,
+                    comment_id: 1,
+            })
+        })
+    })
+    test('404 Returns an error message if the comment_id is not valid', () => {
+        const postObj = {
+            inc_votes: 10
+        }
+        return request(app)
+        .patch('/api/comments/1000')
+        .send (postObj)
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('400 Returns an error message if the object parameters are incorrect', () => {
+        const postObj = {
+            dummy: 10
+        }
+        return request(app)
+        .patch('/api/comments/1')
+        .send (postObj)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+})
+describe('POST /api/articles', () => {
+    test('201: Updates the articles table with the given article and returns an object of the updated article', () => {
+        const postObj = {
+            title: "Test Article",
+            topic: "cats",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            article_img_url:
+            "https://test"
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(postObj)
+        .expect(201)
+        .then(({body}) => {
+            const {article} = body
+            expect(article).toMatchObject({
+                title: "Test Article",
+                topic: "cats",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                article_img_url:
+                "https://test",
+                article_id: 14,
+                votes: 0,
+                created_at: expect.any(String),
+            })
+        })
+    })
+    test('404 Returns an error message if the topic is not valid', () =>{
+        const postObj = {
+            title: "Test Article",
+            topic: "random-topic",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            article_img_url:
+            "https://test"
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(postObj)
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('404 Returns an error message if the author is not valid', () =>{
+        const postObj = {
+            title: "Test Article",
+            topic: "cats",
+            author: "random",
+            body: "I find this existence challenging",
+            article_img_url:
+            "https://test"
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(postObj)
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('400 Returns an error if not all the body parameters are provided', () => {
+        const postObj = {
+            topic: "cats",
+            author: "butter_bridge",
+            article_img_url:
+            "https://test"
+        }
+        return request(app)
+        .post('/api/articles')
+        .send(postObj)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+})
