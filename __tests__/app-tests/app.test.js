@@ -177,6 +177,24 @@ describe('GET /api/articles', () => {
             expect(body.msg).toEqual('Not Found')
             })
     })
+    test('200: Accepts a query of sort_by which sorts the articles by any valid column (defaults to the created_at date)', () => {
+        return request(app)
+        .get('/api/articles?sort_by=author')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toHaveLength(13)
+            expect(articles).toBeSortedBy('author',{descending: true})
+        })
+    })
+    test('400: Returns an error message if the sort_by category is not valid', () => {
+        return request(app)
+        .get('/api/articles?sort_by=random')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+            })
+    })
 })
 describe('GET /api/articles/:article_id/comments', () => {
     test('200: Responds with an array of comments for the given article_id of which each comment should have the tested properties', () => {
