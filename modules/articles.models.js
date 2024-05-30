@@ -27,7 +27,7 @@ exports.selectArticleById = (article_id) => {
     })
 }
 
-exports.selectsArticles = (topic = 'none', sort_by = 'created_at') => {
+exports.selectsArticles = (topic = 'none', sort_by = 'created_at', order = 'DESC') => {
     let sqlQuery = `SELECT articles.article_id, articles.title, articles.topic, articles.author,articles.created_at, articles.votes, articles.article_img_url,
     COALESCE(CAST(countTable.comment_count AS INTEGER),0) AS comment_count
     FROM articles
@@ -40,8 +40,12 @@ exports.selectsArticles = (topic = 'none', sort_by = 'created_at') => {
 
     const queryValues = [];
     const validSortByQueries = ['author','title','article_id','topic','created_at','votes','article_img_url','comment_count']
+    const validOrderQueries = ["ASC", "asc", "DESC", "desc"]
 
     if(!validSortByQueries.includes(sort_by)){
+        return Promise.reject({status:400,msg:'Bad Request'})
+    }
+    if(!validOrderQueries.includes(order)){
         return Promise.reject({status:400,msg:'Bad Request'})
     }
 
@@ -51,9 +55,12 @@ exports.selectsArticles = (topic = 'none', sort_by = 'created_at') => {
     }
 
     if(sort_by){
-        sqlQuery += ` ORDER BY articles.${sort_by} DESC;`
+        sqlQuery += ` ORDER BY articles.${sort_by}`
     }
 
+    if(order){
+        sqlQuery += ` ${order};`
+    }
     return db.query(sqlQuery,queryValues).then((response) => {
         if(topic!=='none' && response.rows.length === 0){
             return Promise.reject({status:404, msg: 'Not Found'})
