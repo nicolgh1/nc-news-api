@@ -95,8 +95,17 @@ describe('GET /api/articles/:article_id', () => {
                 body: expect.any(String),
                 created_at: expect.any(String),
                 article_img_url: expect.any(String),
-                votes: expect.any(Number)
+                votes: expect.any(Number),
+                comment_count: expect.any(Number)
             })
+        })
+    })
+    test('200: Returns the correct number of comments per article',() => {return request(app)
+        .get('/api/articles/9')
+        .expect(200)
+        .then(({body}) => {
+            const {article} = body
+            expect(article.comment_count).toEqual(2)
         })
     })
     test('400: Returns an error message of "Bad Request" if the article_id is not a number', () => {
@@ -116,7 +125,7 @@ describe('GET /api/articles/:article_id', () => {
         })
     })
 })
-describe.only('GET /api/articles', () => {
+describe('GET /api/articles', () => {
     test('200: returns an array of all articles, all having the required keys', () => {
         return request(app)
         .get('/api/articles')
