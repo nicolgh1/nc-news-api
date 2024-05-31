@@ -125,14 +125,14 @@ describe('GET /api/articles/:article_id', () => {
         })
     })
 })
-describe('GET /api/articles', () => {
-    test('200: returns an array of all articles, all having the required keys', () => {
+describe.only('GET /api/articles', () => {
+    test('200: returns an array of all articles, all having the required keys, limited to first 10 if no pagination parameters are given', () => {
         return request(app)
         .get('/api/articles')
         .expect(200)
         .then(({body}) => {
             const {articles} = body
-            expect(articles).toHaveLength(13)
+            expect(articles).toHaveLength(10)
             articles.forEach((article) => {
                 expect(article).toMatchObject({
                     author: expect.any(String),
@@ -177,13 +177,13 @@ describe('GET /api/articles', () => {
             expect(body.msg).toEqual('Not Found')
             })
     })
-    test('200: Accepts a query of sort_by which sorts the articles by any valid column (defaults to the created_at date)', () => {
+    test('200: Accepts a query of sort_by which sorts the articles by any valid column (defaults to the created_at date), limited to first 10 if no pagination parameters are given', () => {
         return request(app)
         .get('/api/articles?sort_by=author')
         .expect(200)
         .then(({body}) => {
             const {articles} = body
-            expect(articles).toHaveLength(13)
+            expect(articles).toHaveLength(10)
             expect(articles).toBeSortedBy('author',{descending: true})
         })
     })
@@ -195,13 +195,13 @@ describe('GET /api/articles', () => {
             expect(body.msg).toEqual('Bad Request')
             })
     })
-    test('200: Accepts a query of order which sorts the articles by any valid column (defaults to the created_at date DESC) in the order requested)', () => {
+    test('200: Accepts a query of order which sorts the articles by any valid column (defaults to the created_at date DESC) in the order requested), limited to first 10 if no pagination parameters are given', () => {
         return request(app)
         .get('/api/articles?sort_by=author&order=ASC')
         .expect(200)
         .then(({body}) => {
             const {articles} = body
-            expect(articles).toHaveLength(13)
+            expect(articles).toHaveLength(10)
             expect(articles).toBeSortedBy('author',{descending: false})
         })
     })
@@ -212,6 +212,60 @@ describe('GET /api/articles', () => {
         .then(({body}) => {
             expect(body.msg).toEqual('Bad Request')
             })
+    })
+    test('200: Pagination: Accepts a query of limit, which limits the number of responses (defaults to 10), and a query of p, which stands for page and specifies the page at which to start (calculated using limit). This test will show the first 6 articles', () => {
+        return request(app)
+        .get('/api/articles?limit=6&p=1')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toHaveLength(6)
+        })
+    })
+    test('200: Pagination: Provides the correct records when combined with other queries', () => {
+        return request(app)
+        .get('/api/articles?limit=3&p=2&sort_by=article_id&order=ASC')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toHaveLength(3)
+            expect(articles[0].article_id).toEqual(4)
+            expect(articles[1].article_id).toEqual(5)
+            expect(articles[2].article_id).toEqual(6)
+        })
+    })
+    test('200: Pagination: Provides all records when given a limit bigger than the number of records and p = 1', () => {
+        return request(app)
+        .get('/api/articles?limit=30&p=1&sort_by=article_id&order=ASC')
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toHaveLength(13)
+        })
+    })
+    test('404: Pagination: Returns an error when given a p that would go over the max number of records', () => {
+        return request(app)
+        .get('/api/articles?limit=10&p=4&sort_by=article_id&order=ASC')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('400: Pagination: Returns an error when given invalid values for p', () => {
+        return request(app)
+        .get('/api/articles?limit=10&p=o')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+    test('400: Pagination: Returns an error when given invalid values for limit', () => {
+        return request(app)
+        .get('/api/articles?limit=err&p=1')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
     })
 })
 describe('GET /api/articles/:article_id/comments', () => {

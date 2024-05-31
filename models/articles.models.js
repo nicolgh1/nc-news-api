@@ -26,7 +26,7 @@ exports.selectArticleById = (article_id) => {
     })
 }
 
-exports.selectsArticles = (topic = 'none', sort_by = 'created_at', order = 'DESC') => {
+exports.selectsArticles = (topic = 'none', sort_by = 'created_at', order = 'DESC', limit = 10, p = 1) => {
     let sqlQuery = `SELECT articles.article_id, articles.title, articles.topic, articles.author,articles.created_at, articles.votes, articles.article_img_url,
     COALESCE(CAST(countTable.comment_count AS INTEGER),0) AS comment_count
     FROM articles
@@ -58,10 +58,15 @@ exports.selectsArticles = (topic = 'none', sort_by = 'created_at', order = 'DESC
     }
 
     if(order){
-        sqlQuery += ` ${order};`
+        sqlQuery += ` ${order}`
     }
+
+    const offset = (p-1)*limit
+    sqlQuery += ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`;
+    queryValues.push(limit, offset)
+
     return db.query(sqlQuery,queryValues).then((response) => {
-        if(topic!=='none' && response.rows.length === 0){
+        if(response.rows.length === 0){
             return Promise.reject({status:404, msg: 'Not Found'})
         }
         return response.rows
