@@ -6,6 +6,7 @@ const {
   formatComments,
 } = require('./utils');
 
+console.log('in seeding')
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db
     .query(`DROP TABLE IF EXISTS comments;`)
@@ -115,5 +116,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       return db.query(insertCommentsQueryStr);
     });
 };
+
+console.log('after seeding')
 
 module.exports = seed;
