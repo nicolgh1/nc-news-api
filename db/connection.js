@@ -12,8 +12,6 @@ if (!process.env.PGDATABASE && !process.env.DATABASE_URL) {
 console.log('before config')
 const config = {};
 
-console.log('after config')
-
 if (ENV === 'production') {
   config.connectionString = process.env.DATABASE_URL;
   config.max = 2;
