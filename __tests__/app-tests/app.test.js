@@ -125,7 +125,7 @@ describe('GET /api/articles/:article_id', () => {
         })
     })
 })
-describe.only('GET /api/articles', () => {
+describe('GET /api/articles', () => {
     test('200: returns an array of all articles, all having the required keys, limited to first 10 if no pagination parameters are given', () => {
         return request(app)
         .get('/api/articles')
