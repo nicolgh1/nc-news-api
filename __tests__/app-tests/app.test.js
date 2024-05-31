@@ -274,6 +274,7 @@ describe('GET /api/articles/:article_id/comments', () => {
         .get('/api/articles/1/comments')
         .then(({body}) => {
             const {comments} = body
+            expect(comments.length).toEqual(10)
             comments.forEach((comment) => {
                 expect(comment).toMatchObject({
                     comment_id: expect.any(Number),
@@ -311,6 +312,39 @@ describe('GET /api/articles/:article_id/comments', () => {
         .expect(404)
         .then(({body}) => {
             expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('200: Pagination: Accepts a query of limit, which limits the number of responses (defaults to 10), and a query of p, which stands for page and specifies the page at which to start (calculated using limit). This test will show the first 6 articles', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=6&p=1')
+        .expect(200)
+        .then(({body}) => {
+            const {comments} = body
+            expect(comments).toHaveLength(6)
+        })
+    })
+    test('404: Pagination: Returns an error when given a p that would go over the max number of records', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=6&p=10')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Not Found')
+        })
+    })
+    test('400: Pagination: Returns an error when given invalid values for p', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=6&p=o')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
+        })
+    })
+    test('400: Pagination: Returns an error when given invalid values for limit', () => {
+        return request(app)
+        .get('/api/articles/1/comments?limit=err&p=1')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toEqual('Bad Request')
         })
     })
 })

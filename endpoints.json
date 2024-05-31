@@ -10,8 +10,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles. By default it shows the first 10 records (limit) from page 1 (p) sorted by created_at in DESC order",
+    "queries": ["author", "topic", "sort_by", "order","limit","p"],
     "valid queries": {
       "sort_by": "'author','title','article_id','topic','created_at','votes','article_img_url','comment_count'",
       "order": "'ASC', 'asc', 'DESC', 'desc'"
@@ -47,8 +47,8 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves an object of comments relating to the requested article",
-    "queries": [],
+    "description": "serves an object of comments relating to the requested article. By default it returns the first 10 (limit) records on page (p) 1 ordered by comment created_at DESC",
+    "queries": ["limit","p"],
     "exampleResponse":{
       "comments": [
         {

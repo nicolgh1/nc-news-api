@@ -73,12 +73,21 @@ exports.selectsArticles = (topic = 'none', sort_by = 'created_at', order = 'DESC
     })
 }
 
-exports.selectArticleComments = (article_id) => {
-    return db.query(`
-    SELECT * FROM comments
+exports.selectArticleComments = (article_id,limit = 10,p = 1) => {
+    let queryValues = [article_id]
+    let sqlQuery = `SELECT * FROM comments
     WHERE article_id = $1
-    ORDER BY created_at DESC;`,[article_id])
+    ORDER BY created_at DESC`
+
+    const offset = (p-1)*limit
+    sqlQuery += ` LIMIT $${queryValues.length + 1} OFFSET $${queryValues.length + 2}`;
+    queryValues.push(limit, offset)
+
+    return db.query(sqlQuery,queryValues)
     .then((response) => {
+        if(p>1 && response.rows.length === 0){
+            return Promise.reject({status:404, msg: 'Not Found'})
+        }
         return response.rows
     })
 }

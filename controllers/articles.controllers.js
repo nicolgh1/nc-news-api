@@ -20,7 +20,8 @@ exports.getArticles = (req,res,next) => {
 
 exports.getArticleComments = (req,res,next) => {
     const {article_id} = req.params
-    const promises = [selectArticleComments(article_id)]
+    const {limit,p} = req.query
+    const promises = [selectArticleComments(article_id,limit,p)]
     if(article_id){
         promises.push(checkItemExistsInTable('article_id',article_id,'articles'))
     }
