@@ -1,7 +1,7 @@
 const app = require('../app')
 const db = require('../db/connection')
 const {articleData, commentData, topicData, userData} = require('../db/data/test-data/index')
-const {selectUsers,selectUserByUsername} = require('../modules/users.models')
+const {selectUsers,selectUserByUsername} = require('../models/users.models')
 
 exports.getUsers = (req,res,next) => {
     selectUsers().then((users) => {

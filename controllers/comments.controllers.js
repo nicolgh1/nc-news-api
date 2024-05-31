@@ -1,9 +1,9 @@
 const app = require('../app')
 const db = require('../db/connection')
 const {articleData, commentData, topicData, userData} = require('../db/data/test-data/index')
-const { calculateVotes } = require('../modules/articles.models')
+const { calculateVotes } = require('../models/articles.models')
 
-const {removeComment,calculateCommentVotes} = require('../modules/comments.models')
+const {removeComment,calculateCommentVotes} = require('../models/comments.models')
 
 
 
