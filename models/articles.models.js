@@ -54,7 +54,7 @@ exports.selectsArticles = (topic = 'none', sort_by = 'created_at', order = 'DESC
     }
 
     if(sort_by){
-        sqlQuery += ` ORDER BY articles.${sort_by}`
+        sqlQuery += ` ORDER BY ${sort_by === 'comment_count' ? 'comment_count' : `articles.${sort_by}`}`
     }
 
     if(order){
