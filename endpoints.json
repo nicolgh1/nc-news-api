@@ -171,7 +171,7 @@
       ] 
     }
   },
-  "POST /api/topi": {
+  "POST /api/topic": {
     "description": "posts the topic and it returns an object of the posted topic. It receives a body as per below description. Both parameters need to be provided",
     "queries": [],
     "exampleBody": {
